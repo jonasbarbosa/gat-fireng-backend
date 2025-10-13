@@ -2,8 +2,8 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flasgger import swag_from
 from datetime import datetime, timedelta, date
-from models import db, Contract, Equipment, Inspection, Client, Branch, Inventory
-from decorators import role_required
+from ..models import db, Contract, Equipment, Inspection, Client, Branch, Inventory
+from ..decorators import role_required
 
 auto_inspections_bp = Blueprint('auto_inspections', __name__)
 

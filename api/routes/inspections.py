@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from datetime import datetime
-from models import db, Inspection, Client, Team, User, Branch, Equipment, Contract
-from decorators import role_required, get_current_user
+from ..models import db, Inspection, Client, Team, User, Branch, Equipment, Contract
+from ..decorators import role_required, get_current_user
 from flasgger import swag_from
 
 inspections_bp = Blueprint('inspections', __name__)

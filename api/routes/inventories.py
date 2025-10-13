@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from models import db, Inventory, Branch
-from decorators import role_required
+from ..models import db, Inventory, Branch
+from ..decorators import role_required
 
 inventories_bp = Blueprint('inventories', __name__)
 

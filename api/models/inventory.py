@@ -1,5 +1,5 @@
 from datetime import datetime
-from models import db
+from .. import db
 
 class Inventory(db.Model):
     """Modelo de inventário - Controle de inventário por filial"""

@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from datetime import datetime
-from models import db, Contract, Client, Team
-from decorators import role_required
+from ..models import db, Contract, Client, Team
+from ..decorators import role_required
 
 contracts_bp = Blueprint('contracts', __name__)
 

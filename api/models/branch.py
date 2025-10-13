@@ -1,5 +1,5 @@
 from datetime import datetime
-from models import db
+from .. import db
 
 class Branch(db.Model):
     """Modelo de filial - Filiais das empresas clientes"""

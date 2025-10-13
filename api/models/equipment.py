@@ -1,5 +1,5 @@
 from datetime import datetime
-from models import db
+from .. import db
 
 # Tabela de relacionamento N:N entre Equipment e Standard
 equipment_standards = db.Table('equipment_standards',

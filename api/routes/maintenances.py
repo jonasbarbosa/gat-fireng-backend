@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from datetime import datetime
-from models import db, Maintenance
-from decorators import role_required, get_current_user
+from ..models import db, Maintenance
+from ..decorators import role_required, get_current_user
 
 maintenances_bp = Blueprint('maintenances', __name__)
 

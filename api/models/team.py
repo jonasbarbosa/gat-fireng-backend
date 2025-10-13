@@ -1,5 +1,5 @@
 from datetime import datetime
-from models import db
+from .. import db
 
 class Team(db.Model):
     """Modelo de equipe - Equipes técnicas"""

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from models import db, Standard
-from decorators import role_required
+from ..models import db, Standard
+from ..decorators import role_required
 
 standards_bp = Blueprint('standards', __name__)
 

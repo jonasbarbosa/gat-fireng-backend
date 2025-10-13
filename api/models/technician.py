@@ -1,5 +1,5 @@
 from datetime import datetime
-from models import db
+from .. import db
 
 class Technician(db.Model):
     """Modelo de técnico - Perfil especializado de usuários técnicos"""

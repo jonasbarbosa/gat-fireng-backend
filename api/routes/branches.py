@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
-from models import db, Branch, Client
-from decorators import role_required
+from ..models import db, Branch, Client
+from ..decorators import role_required
 
 branches_bp = Blueprint('branches', __name__)
 
