@@ -1,9 +1,9 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from config import config
-from models import db, migrate
-from routes import register_routes
+from .config import config
+from .models import db, migrate
+from .routes import register_routes
 
 def create_app(config_name='default'):
     """Factory para criar a aplicação Flask"""
