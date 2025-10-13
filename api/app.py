@@ -71,12 +71,13 @@ API unificada para os sistemas Fireng:
     # Inicializar extensões
     db.init_app(app)
     migrate.init_app(app, db)
+    
+    # CORS simplificado para aceitar qualquer origem
     CORS(app, 
-         origins=app.config['CORS_ORIGINS'],
+         origins=['*'],
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
          allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
-         supports_credentials=True,
-         expose_headers=['Content-Range', 'X-Content-Range'])
+         supports_credentials=False)
     
     # Configurar JWT
     jwt = JWTManager(app)
@@ -111,8 +112,8 @@ API unificada para os sistemas Fireng:
     def after_request(response):
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-        response.headers['Access-Control-Allow-Credentials'] = 'true'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+        response.headers['Access-Control-Max-Age'] = '86400'
         return response
     
     # Endpoint de health check simples
