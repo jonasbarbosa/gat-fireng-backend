@@ -115,6 +115,15 @@ API unificada para os sistemas Fireng:
         response.headers['Access-Control-Allow-Credentials'] = 'true'
         return response
     
+    # Endpoint de health check simples
+    @app.route('/api/health')
+    def health_check():
+        return jsonify({
+            'status': 'ok',
+            'message': 'API funcionando',
+            'version': '1.0.0'
+        })
+    
     # Registrar rotas
     register_routes(app)
     
