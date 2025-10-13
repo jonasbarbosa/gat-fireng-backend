@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from flasgger import Swagger
 from config import config
 from models import db, migrate
 from routes import register_routes
@@ -104,7 +103,8 @@ API unificada para os sistemas Fireng:
             'message': 'Authorization header não encontrado ou inválido'
         }), 401
     
-    Swagger(app, config=swagger_config, template=swagger_template)
+    # Swagger removido temporariamente devido a incompatibilidade
+    # Swagger(app, config=swagger_config, template=swagger_template)
     
     # Adicionar headers CORS manualmente para garantir funcionamento
     @app.after_request
