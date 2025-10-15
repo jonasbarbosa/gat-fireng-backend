@@ -11,6 +11,9 @@ class Config:
     # Configurações gerais
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     
+    # Suporte a DATABASE_URL (prioritário no Vercel)
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    
     # Configurações do banco de dados - MySQL Remoto
     DB_HOST = os.getenv('DB_HOST', 'srv1198.hstgr.io')
     DB_PORT = os.getenv('DB_PORT', '3306')
@@ -23,6 +26,10 @@ class Config:
     
     if USE_SQLITE:
         SQLALCHEMY_DATABASE_URI = 'sqlite:///fireng.db'
+        SQLALCHEMY_ENGINE_OPTIONS = {}
+    elif DATABASE_URL:
+        # Quando DATABASE_URL estiver setado (Vercel), usamos diretamente
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
         SQLALCHEMY_ENGINE_OPTIONS = {}
     else:
         # URL encode da senha para lidar com caracteres especiais
