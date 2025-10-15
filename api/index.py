@@ -1,4 +1,1 @@
-from .app import app as application
-
-def handler(event, context):
-    return application(event, context)
+from app import app

@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import Numeric
-from .. import db
+from . import db
 
 class Maintenance(db.Model):
     """Modelo de manutenção"""

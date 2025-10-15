@@ -1,5 +1,5 @@
 from datetime import datetime
-from .. import db
+from . import db
 
 class Standard(db.Model):
     """Modelo de norma - Normas técnicas NBR, IT, NR"""

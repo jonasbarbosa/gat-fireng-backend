@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager
 from .config import config
 from .models import db, migrate
 from .routes import register_routes
+from flasgger import Swagger
 
 def create_app(config_name='default'):
     """Factory para criar a aplicação Flask"""
@@ -106,6 +107,7 @@ API unificada para os sistemas Fireng:
     
     # Swagger removido temporariamente devido a incompatibilidade
     # Swagger(app, config=swagger_config, template=swagger_template)
+    Swagger(app, config=swagger_config, template=swagger_template)
     
     # Adicionar headers CORS manualmente para garantir funcionamento
     @app.after_request
