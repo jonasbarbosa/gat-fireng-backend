@@ -1,14 +1,28 @@
+import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from .config import config
-from .models import db, migrate
-from .routes import register_routes
+
+# Tornar imports resilientes para rodar tanto localmente (pacote api) quanto no Vercel (executando api/index.py)
+try:
+    from .config import config
+    from .models import db, migrate
+    from .routes import register_routes
+except ImportError:
+    from config import config
+    from models import db, migrate
+    from routes import register_routes
+
+from flasgger import Swagger
 
 def create_app(config_name='default'):
     """Factory para criar a aplicação Flask"""
     
     app = Flask(__name__)
+    # Seleciona config baseada em FLASK_ENV (production/development)
+    env = os.getenv('FLASK_ENV', 'production')
+    selected = 'production' if env == 'production' else 'development'
+    config_name = config_name or selected
     app.config.from_object(config[config_name])
     
     # Configuração do Swagger
@@ -106,6 +120,7 @@ API unificada para os sistemas Fireng:
     
     # Swagger removido temporariamente devido a incompatibilidade
     # Swagger(app, config=swagger_config, template=swagger_template)
+    Swagger(app, config=swagger_config, template=swagger_template)
     
     # Adicionar headers CORS manualmente para garantir funcionamento
     @app.after_request
@@ -128,10 +143,11 @@ API unificada para os sistemas Fireng:
     # Registrar rotas
     register_routes(app)
     
-    # Criar tabelas do banco de dados
-    with app.app_context():
-        db.create_all()
-    
+    # Criar tabelas do banco de dados (apenas se explicitamente habilitado em dev)
+    if app.config.get('DEBUG') and os.getenv('RUN_DB_CREATE', 'false').lower() == 'true':
+        with app.app_context():
+            db.create_all()
+
     return app
 
 # Criar a aplicação para Vercel

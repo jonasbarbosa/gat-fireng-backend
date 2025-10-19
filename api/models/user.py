@@ -1,6 +1,6 @@
 from datetime import datetime
 import bcrypt
-from .. import db
+from . import db
 
 class User(db.Model):
     """Modelo de usuário com controle de roles"""

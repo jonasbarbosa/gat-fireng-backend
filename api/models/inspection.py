@@ -1,5 +1,5 @@
 from datetime import datetime
-from .. import db
+from . import db
 
 class Inspection(db.Model):
     """Modelo de inspeção"""

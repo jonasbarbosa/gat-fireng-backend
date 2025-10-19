@@ -1,4 +1,5 @@
-from .app import app as application
-
-def handler(event, context):
-    return application(event, context)
+try:
+    from app import app
+except ImportError:
+    # Fallback para execução como pacote
+    from .app import app
