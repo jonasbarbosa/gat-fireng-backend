@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -163,14 +164,50 @@ API unificada para os sistemas Fireng:
     def handle_options(path):
         return '', 200
     
-    # Endpoint de health check simples
+    # Endpoint de health check melhorado
     @app.route('/api/health')
     def health_check():
+        try:
+            # Verificar conexão com banco de dados
+            from sqlalchemy import text
+            db.session.execute(text('SELECT 1'))
+            db_status = 'ok'
+        except Exception as e:
+            db_status = f'error: {str(e)}'
+        
         return jsonify({
             'status': 'ok',
             'message': 'API funcionando',
-            'version': '1.0.0'
+            'version': '1.0.0',
+            'database': db_status,
+            'cors_origins': allowed_origins,
+            'timestamp': datetime.now().isoformat()
         })
+    
+    # Tratamento global de erros 500
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        print(f'Erro no servidor: {error}')
+        return jsonify({
+            'error': 'Erro interno do servidor',
+            'message': 'Algo deu errado'
+        }), 500
+    
+    # Tratamento de erros 404
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            'error': 'Endpoint não encontrado',
+            'message': 'A rota solicitada não existe'
+        }), 404
+    
+    # Tratamento de erros 405 (Method Not Allowed)
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+        return jsonify({
+            'error': 'Método não permitido',
+            'message': 'O método HTTP usado não é permitido para esta rota'
+        }), 405
     
     # Registrar rotas
     register_routes(app)
