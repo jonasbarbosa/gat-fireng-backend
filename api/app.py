@@ -86,12 +86,29 @@ API unificada para os sistemas Fireng:
     db.init_app(app)
     migrate.init_app(app, db)
     
-    # CORS simplificado para aceitar qualquer origem
+    # Configuração CORS robusta para produção e desenvolvimento
+    allowed_origins = [
+        'https://gat-fireng-frontend.vercel.app',  # Frontend em produção
+        'http://localhost:5173',                   # Vite dev server
+        'http://localhost:5174',                   # Vite dev server alternativo
+        'http://localhost:3000',                   # React dev server
+        'http://localhost:5001'                    # Backend local
+    ]
+    
+    # Adicionar origens do arquivo de configuração
+    config_origins = app.config.get('CORS_ORIGINS', [])
+    if isinstance(config_origins, str):
+        config_origins = config_origins.split(',')
+    allowed_origins.extend(config_origins)
+    
+    # Remover duplicatas e valores vazios
+    allowed_origins = list(set(filter(None, allowed_origins)))
+    
     CORS(app, 
-         origins=['*'],
+         origins=allowed_origins,
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
          allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
-         supports_credentials=False)
+         supports_credentials=True)
     
     # Configurar JWT
     jwt = JWTManager(app)
@@ -122,14 +139,29 @@ API unificada para os sistemas Fireng:
     # Swagger(app, config=swagger_config, template=swagger_template)
     Swagger(app, config=swagger_config, template=swagger_template)
     
-    # Adicionar headers CORS manualmente para garantir funcionamento
+    # Middleware CORS personalizado para garantir funcionamento
     @app.after_request
     def after_request(response):
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        origin = request.headers.get('Origin')
+        
+        # Verificar se a origem está na lista de origens permitidas
+        if origin in allowed_origins:
+            response.headers['Access-Control-Allow-Origin'] = origin
+        else:
+            # Para desenvolvimento local, permitir localhost
+            if origin and origin.startswith('http://localhost'):
+                response.headers['Access-Control-Allow-Origin'] = origin
+        
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
         response.headers['Access-Control-Max-Age'] = '86400'
         return response
+    
+    # Endpoint para lidar com requisições OPTIONS (CORS preflight)
+    @app.route('/api/<path:path>', methods=['OPTIONS'])
+    def handle_options(path):
+        return '', 200
     
     # Endpoint de health check simples
     @app.route('/api/health')
