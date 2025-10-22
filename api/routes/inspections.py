@@ -78,62 +78,69 @@ inspections_bp = Blueprint('inspections', __name__)
 })
 def list_inspections():
     """Lista inspeções com filtros opcionais"""
-    current_user = get_current_user()
-    
-    # Filtros
-    status = request.args.get('status')
-    technician_id = request.args.get('technician_id')
-    client_id = request.args.get('client_id')
-    team_id = request.args.get('team_id')
-    date_from = request.args.get('date_from')
-    date_to = request.args.get('date_to')
-    search_id = request.args.get('search_id')
-    
-    query = Inspection.query
-    
-    # Técnicos só veem suas próprias inspeções
-    if current_user.role == 'tecnico':
-        query = query.filter_by(technician_id=current_user.id)
-    elif technician_id:
-        query = query.filter_by(technician_id=technician_id)
-    
-    if status:
-        query = query.filter_by(status=status)
-    
-    if client_id:
-        query = query.filter_by(client_id=client_id)
-    
-    if team_id:
-        query = query.filter_by(team_id=team_id)
-    
-    if date_from:
-        try:
-            date_from_obj = datetime.fromisoformat(date_from)
-            query = query.filter(Inspection.scheduled_date >= date_from_obj)
-        except ValueError:
-            return jsonify({'error': 'Formato de data inválido para date_from'}), 400
-    
-    if date_to:
-        try:
-            date_to_obj = datetime.fromisoformat(date_to)
-            query = query.filter(Inspection.scheduled_date <= date_to_obj)
-        except ValueError:
-            return jsonify({'error': 'Formato de data inválido para date_to'}), 400
-    
-    # Filtro por ID
-    if search_id:
-        try:
-            search_id_int = int(search_id)
-            query = query.filter(Inspection.id == search_id_int)
-        except ValueError:
-            return jsonify({'error': 'ID deve ser um número inteiro'}), 400
-    
-    inspections = query.order_by(Inspection.scheduled_date.desc()).all()
-    
-    return jsonify({
-        'inspections': [inspection.to_dict() for inspection in inspections],
-        'total': len(inspections)
-    }), 200
+    try:
+        current_user = get_current_user()
+        
+        # Filtros
+        status = request.args.get('status')
+        technician_id = request.args.get('technician_id')
+        client_id = request.args.get('client_id')
+        team_id = request.args.get('team_id')
+        date_from = request.args.get('date_from')
+        date_to = request.args.get('date_to')
+        search_id = request.args.get('search_id')
+        
+        query = Inspection.query
+        
+        # Técnicos só veem suas próprias inspeções
+        if current_user.role == 'tecnico':
+            query = query.filter_by(technician_id=current_user.id)
+        elif technician_id:
+            query = query.filter_by(technician_id=technician_id)
+        
+        if status:
+            query = query.filter_by(status=status)
+        
+        if client_id:
+            query = query.filter_by(client_id=client_id)
+        
+        if team_id:
+            query = query.filter_by(team_id=team_id)
+        
+        if date_from:
+            try:
+                date_from_obj = datetime.fromisoformat(date_from)
+                query = query.filter(Inspection.scheduled_date >= date_from_obj)
+            except ValueError:
+                return jsonify({'error': 'Formato de data inválido para date_from'}), 400
+        
+        if date_to:
+            try:
+                date_to_obj = datetime.fromisoformat(date_to)
+                query = query.filter(Inspection.scheduled_date <= date_to_obj)
+            except ValueError:
+                return jsonify({'error': 'Formato de data inválido para date_to'}), 400
+        
+        # Filtro por ID
+        if search_id:
+            try:
+                search_id_int = int(search_id)
+                query = query.filter(Inspection.id == search_id_int)
+            except ValueError:
+                return jsonify({'error': 'ID deve ser um número inteiro'}), 400
+        
+        inspections = query.order_by(Inspection.scheduled_date.desc()).all()
+        
+        return jsonify({
+            'inspections': [inspection.to_dict() for inspection in inspections],
+            'total': len(inspections)
+        }), 200
+    except Exception as e:
+        print(f"Erro ao listar inspeções: {str(e)}")
+        return jsonify({
+            'error': 'Erro interno do servidor',
+            'message': str(e)
+        }), 500
 
 
 @inspections_bp.route('/<int:inspection_id>/assign-team', methods=['POST'])
