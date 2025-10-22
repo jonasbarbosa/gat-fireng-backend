@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
@@ -86,12 +87,29 @@ API unificada para os sistemas Fireng:
     db.init_app(app)
     migrate.init_app(app, db)
     
-    # CORS simplificado para aceitar qualquer origem
+    # Configuração CORS robusta para produção e desenvolvimento
+    allowed_origins = [
+        'https://gat-fireng-frontend.vercel.app',  # Frontend em produção
+        'http://localhost:5173',                   # Vite dev server
+        'http://localhost:5174',                   # Vite dev server alternativo
+        'http://localhost:3000',                   # React dev server
+        'http://localhost:5001'                    # Backend local
+    ]
+    
+    # Adicionar origens do arquivo de configuração
+    config_origins = app.config.get('CORS_ORIGINS', [])
+    if isinstance(config_origins, str):
+        config_origins = config_origins.split(',')
+    allowed_origins.extend(config_origins)
+    
+    # Remover duplicatas e valores vazios
+    allowed_origins = list(set(filter(None, allowed_origins)))
+    
     CORS(app, 
-         origins=['*'],
+         origins=allowed_origins,
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
          allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
-         supports_credentials=False)
+         supports_credentials=True)
     
     # Configurar JWT
     jwt = JWTManager(app)
@@ -122,23 +140,74 @@ API unificada para os sistemas Fireng:
     # Swagger(app, config=swagger_config, template=swagger_template)
     Swagger(app, config=swagger_config, template=swagger_template)
     
-    # Adicionar headers CORS manualmente para garantir funcionamento
+    # Middleware CORS personalizado para garantir funcionamento
     @app.after_request
     def after_request(response):
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        origin = request.headers.get('Origin')
+        
+        # Verificar se a origem está na lista de origens permitidas
+        if origin in allowed_origins:
+            response.headers['Access-Control-Allow-Origin'] = origin
+        else:
+            # Para desenvolvimento local, permitir localhost
+            if origin and origin.startswith('http://localhost'):
+                response.headers['Access-Control-Allow-Origin'] = origin
+        
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With'
+        response.headers['Access-Control-Allow-Credentials'] = 'true'
         response.headers['Access-Control-Max-Age'] = '86400'
         return response
     
-    # Endpoint de health check simples
+    # Endpoint para lidar com requisições OPTIONS (CORS preflight)
+    @app.route('/api/<path:path>', methods=['OPTIONS'])
+    def handle_options(path):
+        return '', 200
+    
+    # Endpoint de health check melhorado
     @app.route('/api/health')
     def health_check():
+        try:
+            # Verificar conexão com banco de dados
+            from sqlalchemy import text
+            db.session.execute(text('SELECT 1'))
+            db_status = 'ok'
+        except Exception as e:
+            db_status = f'error: {str(e)}'
+        
         return jsonify({
             'status': 'ok',
             'message': 'API funcionando',
-            'version': '1.0.0'
+            'version': '1.0.0',
+            'database': db_status,
+            'cors_origins': allowed_origins,
+            'timestamp': datetime.now().isoformat()
         })
+    
+    # Tratamento global de erros 500
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        print(f'Erro no servidor: {error}')
+        return jsonify({
+            'error': 'Erro interno do servidor',
+            'message': 'Algo deu errado'
+        }), 500
+    
+    # Tratamento de erros 404
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+            'error': 'Endpoint não encontrado',
+            'message': 'A rota solicitada não existe'
+        }), 404
+    
+    # Tratamento de erros 405 (Method Not Allowed)
+    @app.errorhandler(405)
+    def method_not_allowed(error):
+        return jsonify({
+            'error': 'Método não permitido',
+            'message': 'O método HTTP usado não é permitido para esta rota'
+        }), 405
     
     # Registrar rotas
     register_routes(app)
