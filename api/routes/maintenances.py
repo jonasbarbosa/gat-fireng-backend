@@ -113,7 +113,11 @@ def create_maintenance():
         equipment=data.get('equipment'),
         client_id=data['client_id'],
         technician_id=data.get('technician_id'),
-        created_by=current_user.id
+        created_by=current_user.id,
+        branch_id=data.get('branch_id'),
+        equipment_id=data.get('equipment_id'),
+        contract_id=data.get('contract_id'),
+        team_id=data.get('team_id')
     )
     
     db.session.add(maintenance)
@@ -179,6 +183,18 @@ def update_maintenance(maintenance_id):
     
     if 'technician_id' in data and current_user.has_role('superadmin', 'admin', 'coord'):
         maintenance.technician_id = data['technician_id']
+    
+    if 'branch_id' in data and current_user.has_role('superadmin', 'admin', 'coord'):
+        maintenance.branch_id = data['branch_id']
+    
+    if 'equipment_id' in data and current_user.has_role('superadmin', 'admin', 'coord'):
+        maintenance.equipment_id = data['equipment_id']
+    
+    if 'contract_id' in data and current_user.has_role('superadmin', 'admin', 'coord'):
+        maintenance.contract_id = data['contract_id']
+    
+    if 'team_id' in data and current_user.has_role('superadmin', 'admin', 'coord'):
+        maintenance.team_id = data['team_id']
     
     if 'work_performed' in data:
         maintenance.work_performed = data['work_performed']
