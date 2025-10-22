@@ -9,31 +9,38 @@ clients_bp = Blueprint('clients', __name__)
 @jwt_required()
 def list_clients():
     """Lista todos os clientes"""
-    is_active = request.args.get('is_active')
-    search = request.args.get('search')
-    
-    query = Client.query
-    
-    if is_active is not None:
-        is_active_bool = is_active.lower() == 'true'
-        query = query.filter_by(is_active=is_active_bool)
-    
-    if search:
-        search_pattern = f'%{search}%'
-        query = query.filter(
-            db.or_(
-                Client.name.ilike(search_pattern),
-                Client.email.ilike(search_pattern),
-                Client.cpf_cnpj.ilike(search_pattern)
+    try:
+        is_active = request.args.get('is_active')
+        search = request.args.get('search')
+        
+        query = Client.query
+        
+        if is_active is not None:
+            is_active_bool = is_active.lower() == 'true'
+            query = query.filter_by(is_active=is_active_bool)
+        
+        if search:
+            search_pattern = f'%{search}%'
+            query = query.filter(
+                db.or_(
+                    Client.name.ilike(search_pattern),
+                    Client.email.ilike(search_pattern),
+                    Client.cpf_cnpj.ilike(search_pattern)
+                )
             )
-        )
-    
-    clients = query.all()
-    
-    return jsonify({
-        'clients': [client.to_dict() for client in clients],
-        'total': len(clients)
-    }), 200
+        
+        clients = query.all()
+        
+        return jsonify({
+            'clients': [client.to_dict() for client in clients],
+            'total': len(clients)
+        }), 200
+    except Exception as e:
+        print(f"Erro ao listar clientes: {str(e)}")
+        return jsonify({
+            'error': 'Erro interno do servidor',
+            'message': str(e)
+        }), 500
 
 
 @clients_bp.route('/<int:client_id>', methods=['GET'])

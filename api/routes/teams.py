@@ -24,18 +24,25 @@ def list_teams():
       200:
         description: Lista de equipes
     """
-    is_active = request.args.get('is_active', type=lambda v: v.lower() == 'true')
-    
-    query = Team.query
-    
-    if is_active is not None:
-        query = query.filter_by(is_active=is_active)
-    
-    teams = query.all()
-    
-    return jsonify({
-        'teams': [team.to_dict(include_relations=True) for team in teams]
-    }), 200
+    try:
+        is_active = request.args.get('is_active', type=lambda v: v.lower() == 'true')
+        
+        query = Team.query
+        
+        if is_active is not None:
+            query = query.filter_by(is_active=is_active)
+        
+        teams = query.all()
+        
+        return jsonify({
+            'teams': [team.to_dict(include_relations=True) for team in teams]
+        }), 200
+    except Exception as e:
+        print(f"Erro ao listar equipes: {str(e)}")
+        return jsonify({
+            'error': 'Erro interno do servidor',
+            'message': str(e)
+        }), 500
 
 
 @teams_bp.route('', methods=['POST'])

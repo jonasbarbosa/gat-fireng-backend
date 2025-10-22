@@ -10,53 +10,60 @@ maintenances_bp = Blueprint('maintenances', __name__)
 @jwt_required()
 def list_maintenances():
     """Lista manutenções com filtros opcionais"""
-    current_user = get_current_user()
+    try:
+        current_user = get_current_user()
     
-    # Filtros
-    status = request.args.get('status')
-    maintenance_type = request.args.get('type')
-    technician_id = request.args.get('technician_id')
-    client_id = request.args.get('client_id')
-    date_from = request.args.get('date_from')
-    date_to = request.args.get('date_to')
+        # Filtros
+        status = request.args.get('status')
+        maintenance_type = request.args.get('type')
+        technician_id = request.args.get('technician_id')
+        client_id = request.args.get('client_id')
+        date_from = request.args.get('date_from')
+        date_to = request.args.get('date_to')
+        
+        query = Maintenance.query
+        
+        # Técnicos só veem suas próprias manutenções
+        if current_user.role == 'tecnico':
+            query = query.filter_by(technician_id=current_user.id)
+        elif technician_id:
+            query = query.filter_by(technician_id=technician_id)
+        
+        if status:
+            query = query.filter_by(status=status)
+        
+        if maintenance_type:
+            query = query.filter_by(maintenance_type=maintenance_type)
+        
+        if client_id:
+            query = query.filter_by(client_id=client_id)
+        
+        if date_from:
+            try:
+                date_from_obj = datetime.fromisoformat(date_from)
+                query = query.filter(Maintenance.scheduled_date >= date_from_obj)
+            except ValueError:
+                return jsonify({'error': 'Formato de data inválido para date_from'}), 400
+        
+        if date_to:
+            try:
+                date_to_obj = datetime.fromisoformat(date_to)
+                query = query.filter(Maintenance.scheduled_date <= date_to_obj)
+            except ValueError:
+                return jsonify({'error': 'Formato de data inválido para date_to'}), 400
     
-    query = Maintenance.query
-    
-    # Técnicos só veem suas próprias manutenções
-    if current_user.role == 'tecnico':
-        query = query.filter_by(technician_id=current_user.id)
-    elif technician_id:
-        query = query.filter_by(technician_id=technician_id)
-    
-    if status:
-        query = query.filter_by(status=status)
-    
-    if maintenance_type:
-        query = query.filter_by(maintenance_type=maintenance_type)
-    
-    if client_id:
-        query = query.filter_by(client_id=client_id)
-    
-    if date_from:
-        try:
-            date_from_obj = datetime.fromisoformat(date_from)
-            query = query.filter(Maintenance.scheduled_date >= date_from_obj)
-        except ValueError:
-            return jsonify({'error': 'Formato de data inválido para date_from'}), 400
-    
-    if date_to:
-        try:
-            date_to_obj = datetime.fromisoformat(date_to)
-            query = query.filter(Maintenance.scheduled_date <= date_to_obj)
-        except ValueError:
-            return jsonify({'error': 'Formato de data inválido para date_to'}), 400
-    
-    maintenances = query.order_by(Maintenance.scheduled_date.desc()).all()
-    
-    return jsonify({
-        'maintenances': [maintenance.to_dict() for maintenance in maintenances],
-        'total': len(maintenances)
-    }), 200
+        maintenances = query.order_by(Maintenance.scheduled_date.desc()).all()
+        
+        return jsonify({
+            'maintenances': [maintenance.to_dict() for maintenance in maintenances],
+            'total': len(maintenances)
+        }), 200
+    except Exception as e:
+        print(f"Erro ao listar manutenções: {str(e)}")
+        return jsonify({
+            'error': 'Erro interno do servidor',
+            'message': str(e)
+        }), 500
 
 
 @maintenances_bp.route('/<int:maintenance_id>', methods=['GET'])
