@@ -21,6 +21,7 @@ class Team(db.Model):
     
     # Relationships
     coordinator = db.relationship('User', foreign_keys=[coordinator_id], backref='coordinated_teams')
+    technicians = db.relationship('Technician', backref='team', lazy='dynamic')
     
     def __repr__(self):
         return f'<Team {self.id} - {self.name}>'
@@ -52,8 +53,9 @@ class Team(db.Model):
                 }
             
             # Informações dos técnicos
-            if hasattr(self, 'technicians'):
-                data['members_count'] = len(self.technicians)
+            try:
+                technicians_list = list(self.technicians)
+                data['members_count'] = len(technicians_list)
                 data['technicians'] = [
                     {
                         'id': tech.id,
@@ -70,8 +72,12 @@ class Team(db.Model):
                             'is_active': tech.user.is_active if tech.user else None
                         }
                     }
-                    for tech in self.technicians
+                    for tech in technicians_list
                 ]
+            except Exception as e:
+                print(f"Erro ao carregar técnicos da equipe {self.id}: {str(e)}")
+                data['members_count'] = 0
+                data['technicians'] = []
             
             # Contagem de contratos
             if hasattr(self, 'contracts'):

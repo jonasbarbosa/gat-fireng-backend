@@ -131,29 +131,36 @@ def login():
       403:
         description: Usuário inativo
     """
-    data = request.get_json()
-    
-    if not data or not data.get('email') or not data.get('password'):
-        return jsonify({'error': 'Email e senha são obrigatórios'}), 400
-    
-    user = User.query.filter_by(email=data['email']).first()
-    
-    if not user or not user.check_password(data['password']):
-        return jsonify({'error': 'Credenciais inválidas'}), 401
-    
-    if not user.is_active:
-        return jsonify({'error': 'Usuário inativo'}), 403
-    
-    # Gerar tokens (identity deve ser string)
-    access_token = create_access_token(identity=str(user.id))
-    refresh_token = create_refresh_token(identity=str(user.id))
-    
-    return jsonify({
-        'message': 'Login realizado com sucesso',
-        'access_token': access_token,
-        'refresh_token': refresh_token,
-        'user': user.to_dict()
-    }), 200
+    try:
+        data = request.get_json()
+        
+        if not data or not data.get('email') or not data.get('password'):
+            return jsonify({'error': 'Email e senha são obrigatórios'}), 400
+        
+        user = User.query.filter_by(email=data['email']).first()
+        
+        if not user or not user.check_password(data['password']):
+            return jsonify({'error': 'Credenciais inválidas'}), 401
+        
+        if not user.is_active:
+            return jsonify({'error': 'Usuário inativo'}), 403
+        
+        # Gerar tokens (identity deve ser string)
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
+        
+        return jsonify({
+            'message': 'Login realizado com sucesso',
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'user': user.to_dict()
+        }), 200
+    except Exception as e:
+        print(f"Erro no login: {str(e)}")
+        return jsonify({
+            'error': 'Erro interno do servidor',
+            'message': str(e)
+        }), 500
 
 
 @auth_bp.route('/refresh', methods=['POST'])

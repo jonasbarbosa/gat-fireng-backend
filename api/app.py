@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
@@ -137,6 +137,16 @@ API unificada para os sistemas Fireng:
     @app.route('/api/<path:path>', methods=['OPTIONS'])
     def handle_options(path):
         return '', 200
+    
+    # Endpoint específico para OPTIONS em todas as rotas
+    @app.before_request
+    def handle_preflight():
+        if request.method == "OPTIONS":
+            response = make_response()
+            response.headers.add("Access-Control-Allow-Origin", "*")
+            response.headers.add('Access-Control-Allow-Headers', "Content-Type,Authorization,X-Requested-With")
+            response.headers.add('Access-Control-Allow-Methods', "GET,PUT,POST,DELETE,OPTIONS")
+            return response
     
     # Endpoint de health check melhorado
     @app.route('/api/health')
