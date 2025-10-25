@@ -20,11 +20,11 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relacionamentos
-    inspections = db.relationship('Inspection', backref='technician_user', lazy='dynamic', 
-                                 foreign_keys='Inspection.technician_id')
-    maintenances = db.relationship('Maintenance', backref='technician_user', lazy='dynamic',
-                                  foreign_keys='Maintenance.technician_id')
+    # Relacionamentos - removidos temporariamente para resolver conflito
+    # inspections = db.relationship('Inspection', backref='technician_user', lazy='dynamic', 
+    #                              foreign_keys='Inspection.technician_id')
+    # maintenances = db.relationship('Maintenance', backref='technician_user', lazy='dynamic',
+    #                               foreign_keys='Maintenance.technician_id')
     
     def __repr__(self):
         return f'<User {self.email} - {self.role}>'
