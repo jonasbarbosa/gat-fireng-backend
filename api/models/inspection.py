@@ -82,18 +82,20 @@ class Inspection(db.Model):
         }
         
         if include_relations:
-            if self.client:
-                data['client'] = self.client.to_dict()
-            if self.technician:
-                data['technician'] = self.technician.to_dict()
-            if self.team:
-                data['team'] = self.team.to_dict()
-            if self.branch:
-                data['branch'] = self.branch.to_dict()
-            if self.contract:
-                data['contract'] = self.contract.to_dict()
-            if self.equipment_obj:
-                data['equipment_obj'] = self.equipment_obj.to_dict()
+            # Relacionamentos removidos temporariamente - usar apenas IDs
+            # if self.client:
+            #     data['client'] = self.client.to_dict()
+            # if self.technician:
+            #     data['technician'] = self.technician.to_dict()
+            # if self.team:
+            #     data['team'] = self.team.to_dict()
+            # if self.branch:
+            #     data['branch'] = self.branch.to_dict()
+            # if self.contract:
+            #     data['contract'] = self.contract.to_dict()
+            # if self.equipment_obj:
+            #     data['equipment_obj'] = self.equipment_obj.to_dict()
+            pass
         
         return data
 

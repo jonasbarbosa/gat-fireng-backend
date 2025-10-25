@@ -102,10 +102,12 @@ class Maintenance(db.Model):
         }
         
         if include_relations:
-            if self.client:
-                data['client'] = self.client.to_dict()
-            if self.technician:
-                data['technician'] = self.technician.to_dict()
+            # Relacionamentos removidos temporariamente - usar apenas IDs
+            # if self.client:
+            #     data['client'] = self.client.to_dict()
+            # if self.technician:
+            #     data['technician'] = self.technician.to_dict()
+            pass
         
         return data
 

@@ -40,44 +40,44 @@ class Team(db.Model):
         }
         
         if include_relations:
-            # Informações do coordenador
-            if self.coordinator:
-                data['coordinator_name'] = self.coordinator.name
-                data['coordinator_email'] = self.coordinator.email
-                data['coordinator_phone'] = self.coordinator.phone
-                data['coordinator'] = {
-                    'id': self.coordinator.id,
-                    'name': self.coordinator.name,
-                    'email': self.coordinator.email,
-                    'phone': self.coordinator.phone
-                }
+            # Informações do coordenador - relacionamento removido temporariamente
+            # if self.coordinator:
+            #     data['coordinator_name'] = self.coordinator.name
+            #     data['coordinator_email'] = self.coordinator.email
+            #     data['coordinator_phone'] = self.coordinator.phone
+            #     data['coordinator'] = {
+            #         'id': self.coordinator.id,
+            #         'name': self.coordinator.name,
+            #         'email': self.coordinator.email,
+            #         'phone': self.coordinator.phone
+            #     }
             
-            # Informações dos técnicos
-            try:
-                technicians_list = list(self.technicians)
-                data['members_count'] = len(technicians_list)
-                data['technicians'] = [
-                    {
-                        'id': tech.id,
-                        'user_id': tech.user_id,
-                        'registration_number': tech.registration_number,
-                        'specializations': tech.specializations if isinstance(tech.specializations, list) else [],
-                        'experience_years': tech.experience_years,
-                        'notes': tech.notes,
-                        'user': {
-                            'id': tech.user.id if tech.user else None,
-                            'name': tech.user.name if tech.user else None,
-                            'email': tech.user.email if tech.user else None,
-                            'phone': tech.user.phone if tech.user else None,
-                            'is_active': tech.user.is_active if tech.user else None
-                        }
-                    }
-                    for tech in technicians_list
-                ]
-            except Exception as e:
-                print(f"Erro ao carregar técnicos da equipe {self.id}: {str(e)}")
-                data['members_count'] = 0
-                data['technicians'] = []
+            # Informações dos técnicos - relacionamento removido temporariamente
+            # try:
+            #     technicians_list = list(self.technicians)
+            #     data['members_count'] = len(technicians_list)
+            #     data['technicians'] = [
+            #         {
+            #             'id': tech.id,
+            #             'user_id': tech.user_id,
+            #             'registration_number': tech.registration_number,
+            #             'specializations': tech.specializations if isinstance(tech.specializations, list) else [],
+            #             'experience_years': tech.experience_years,
+            #             'notes': tech.notes,
+            #             'user': {
+            #                 'id': tech.user.id if tech.user else None,
+            #                 'name': tech.user.name if tech.user else None,
+            #                 'email': tech.user.email if tech.user else None,
+            #                 'phone': tech.user.phone if tech.user else None,
+            #                 'is_active': tech.user.is_active if tech.user else None
+            #             }
+            #         }
+            #         for tech in technicians_list
+            #     ]
+            # except Exception as e:
+            #     print(f"Erro ao carregar técnicos da equipe {self.id}: {str(e)}")
+            data['members_count'] = 0
+            data['technicians'] = []
             
             # Contagem de contratos
             if hasattr(self, 'contracts'):
