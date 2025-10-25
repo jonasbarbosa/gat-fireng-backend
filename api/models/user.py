@@ -21,9 +21,9 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relacionamentos
-    inspections = db.relationship('Inspection', backref='technician', lazy='dynamic', 
+    inspections = db.relationship('Inspection', backref='technician_user', lazy='dynamic', 
                                  foreign_keys='Inspection.technician_id')
-    maintenances = db.relationship('Maintenance', backref='technician', lazy='dynamic',
+    maintenances = db.relationship('Maintenance', backref='technician_user', lazy='dynamic',
                                   foreign_keys='Maintenance.technician_id')
     
     def __repr__(self):

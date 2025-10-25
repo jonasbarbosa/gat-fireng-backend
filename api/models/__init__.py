@@ -10,12 +10,12 @@ from .client import Client
 from .branch import Branch
 from .team import Team
 from .contract import Contract
-from .technician import Technician
 from .standard import Standard
 from .inventory import Inventory
 from .equipment import Equipment, equipment_standards
-from .inspection import Inspection
 from .maintenance import Maintenance
+from .inspection import Inspection
+from .technician import Technician
 
 __all__ = [
     'db', 
@@ -25,12 +25,12 @@ __all__ = [
     'Branch',
     'Team',
     'Contract',
-    'Technician',
     'Standard',
     'Inventory',
     'Equipment',
     'equipment_standards',
+    'Maintenance',
     'Inspection', 
-    'Maintenance'
+    'Technician'
 ]
 
