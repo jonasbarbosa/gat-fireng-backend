@@ -23,9 +23,9 @@ class Technician(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
-    user = db.relationship('User', backref='technician_profile')
-    team = db.relationship('Team', backref='technicians')
+    # Relationships - removidos temporariamente para resolver conflito
+    # user = db.relationship('User', backref='technician_profile')
+    # team = db.relationship('Team', backref='technicians')
     
     def __repr__(self):
         return f'<Technician {self.id} - User {self.user_id}>'
