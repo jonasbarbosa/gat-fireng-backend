@@ -20,11 +20,11 @@ class Client(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relacionamentos
-    inspections = db.relationship('Inspection', backref='client', lazy='dynamic')
-    maintenances = db.relationship('Maintenance', backref='client', lazy='dynamic')
-    branches = db.relationship('Branch', backref='company', lazy='dynamic')
-    contracts = db.relationship('Contract', backref='company', lazy='dynamic')
+    # Relacionamentos - removidos temporariamente para resolver conflito
+    # inspections = db.relationship('Inspection', backref='client', lazy='dynamic')
+    # maintenances = db.relationship('Maintenance', backref='client', lazy='dynamic')
+    # branches = db.relationship('Branch', backref='company', lazy='dynamic')
+    # contracts = db.relationship('Contract', backref='company', lazy='dynamic')
     
     def __repr__(self):
         return f'<Client {self.name}>'
