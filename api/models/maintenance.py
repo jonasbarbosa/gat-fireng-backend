@@ -57,14 +57,14 @@ class Maintenance(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships adicionais
-    client = db.relationship('Client', foreign_keys=[client_id])
-    technician = db.relationship('User', foreign_keys=[technician_id])
-    created_by_user = db.relationship('User', foreign_keys=[created_by])
-    branch = db.relationship('Branch', foreign_keys=[branch_id])
-    equipment_obj = db.relationship('Equipment', foreign_keys=[equipment_id])
-    contract = db.relationship('Contract', foreign_keys=[contract_id])
-    team = db.relationship('Team', foreign_keys=[team_id])
+    # Relationships adicionais - removidos temporariamente para resolver conflito
+    # client = db.relationship('Client', foreign_keys=[client_id])
+    # technician = db.relationship('User', foreign_keys=[technician_id])
+    # created_by_user = db.relationship('User', foreign_keys=[created_by])
+    # branch = db.relationship('Branch', foreign_keys=[branch_id])
+    # equipment_obj = db.relationship('Equipment', foreign_keys=[equipment_id])
+    # contract = db.relationship('Contract', foreign_keys=[contract_id])
+    # team = db.relationship('Team', foreign_keys=[team_id])
     
     def __repr__(self):
         return f'<Maintenance {self.id} - {self.title}>'
