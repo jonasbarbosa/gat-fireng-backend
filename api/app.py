@@ -87,9 +87,17 @@ API unificada para os sistemas Fireng:
     db.init_app(app)
     migrate.init_app(app, db)
     
-    # CORS simplificado para aceitar qualquer origem em produção
+    # Configuração CORS para produção no Vercel
+    allowed_origins = [
+        'https://gat-fireng-frontend.vercel.app',
+        'https://gat-fireng-frontend-git-main.vercel.app',  # Branch previews
+        'https://gat-fireng-frontend-git-develop.vercel.app',  # Branch previews
+        'http://localhost:5173',  # Desenvolvimento local
+        'http://localhost:3000'   # Desenvolvimento local alternativo
+    ]
+    
     CORS(app, 
-         origins=['*'],  # Permitir todas as origens
+         origins=allowed_origins,
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
          allow_headers=['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
          supports_credentials=False)  # Desabilitar credentials para evitar problemas
@@ -126,11 +134,19 @@ API unificada para os sistemas Fireng:
     # Middleware CORS personalizado para garantir funcionamento
     @app.after_request
     def after_request(response):
-        # Sempre adicionar headers CORS, mesmo em caso de erro
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        # Verificar se a origem da requisição está na lista de origens permitidas
+        origin = request.headers.get('Origin')
+        if origin in allowed_origins:
+            response.headers['Access-Control-Allow-Origin'] = origin
+        else:
+            # Para desenvolvimento local, permitir localhost
+            if origin and ('localhost' in origin or '127.0.0.1' in origin):
+                response.headers['Access-Control-Allow-Origin'] = origin
+        
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS, PATCH'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-Requested-With, Accept'
         response.headers['Access-Control-Max-Age'] = '86400'
+        response.headers['Access-Control-Allow-Credentials'] = 'false'
         return response
     
     # Endpoint para lidar com requisições OPTIONS (CORS preflight)
@@ -143,9 +159,14 @@ API unificada para os sistemas Fireng:
     def handle_preflight():
         if request.method == "OPTIONS":
             response = make_response()
-            response.headers.add("Access-Control-Allow-Origin", "*")
-            response.headers.add('Access-Control-Allow-Headers', "Content-Type,Authorization,X-Requested-With")
-            response.headers.add('Access-Control-Allow-Methods', "GET,PUT,POST,DELETE,OPTIONS")
+            origin = request.headers.get('Origin')
+            if origin in allowed_origins:
+                response.headers.add("Access-Control-Allow-Origin", origin)
+            elif origin and ('localhost' in origin or '127.0.0.1' in origin):
+                response.headers.add("Access-Control-Allow-Origin", origin)
+            response.headers.add('Access-Control-Allow-Headers', "Content-Type,Authorization,X-Requested-With,Accept")
+            response.headers.add('Access-Control-Allow-Methods', "GET,PUT,POST,DELETE,OPTIONS,PATCH")
+            response.headers.add('Access-Control-Allow-Credentials', 'false')
             return response
     
     # Endpoint de health check melhorado
