@@ -19,9 +19,9 @@ class Team(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships
-    coordinator = db.relationship('User', foreign_keys=[coordinator_id], backref='coordinated_teams')
-    technicians = db.relationship('Technician', backref='team', lazy='dynamic')
+    # Relationships - removidos temporariamente para resolver conflito
+    # coordinator = db.relationship('User', foreign_keys=[coordinator_id], backref='coordinated_teams')
+    # technicians = db.relationship('Technician', backref='team', lazy='dynamic')
     
     def __repr__(self):
         return f'<Team {self.id} - {self.name}>'
