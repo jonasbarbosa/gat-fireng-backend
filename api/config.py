@@ -37,11 +37,16 @@ class Config:
         # Configurações de pool de conexões para evitar "MySQL server has gone away"
         SQLALCHEMY_ENGINE_OPTIONS = {
             'pool_pre_ping': True,  # Verifica conexão antes de usar
-            'pool_recycle': 280,    # Recicla conexões a cada 280 segundos (antes do timeout do MySQL)
-            'pool_size': 10,        # Número de conexões no pool
-            'max_overflow': 20,     # Conexões extras permitidas
+            'pool_recycle': 300,    # Recicla conexões a cada 300 segundos
+            'pool_size': 5,          # Número de conexões no pool (reduzido)
+            'max_overflow': 10,      # Conexões extras permitidas (reduzido)
+            'pool_timeout': 20,      # Timeout para obter conexão do pool
             'connect_args': {
-                'connect_timeout': 10
+                'connect_timeout': 10,
+                'read_timeout': 10,
+                'write_timeout': 10,
+                'charset': 'utf8mb4',
+                'autocommit': True
             }
         }
     
